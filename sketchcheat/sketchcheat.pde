@@ -28,9 +28,13 @@ int period = 8;
 // Called once
 void initCoords(){
   hx = 100;
+  // 5 from top
   hy = 5;
   wx = fx;
   wy = hy;
+  mx = wx;
+  // 5 from bottom
+  my = fy - mysize - 5;
 }
   
 void setup() { 
@@ -68,30 +72,54 @@ void setup() {
 void draw() {
   
   if (stage == 4) {
-    if (temp == 100){
+    if (temp == period * 20){
       stage = 0;
       temp = 0;
       initCoords();
     }
-    temp++;
-    mx = hx + hxsize + 20;
-    my = hy;
+    
+    /////////
+    pushMatrix();
+    translate(hx, hy);    
+    rotate(PI/30 * (floor(temp/period) % 2));
+    image(himg, 0, 0);
+    popMatrix();
+
+    pushMatrix();
+    translate(mx, my);    
+    rotate(-PI/30 * (floor(temp/period) % 2));
+    image(mimg, 0, 0);
+    popMatrix();
+    
+    
+    temp ++;
+
+  }
+  
+  // h goes down, w leaves, m arrives
+  if (stage == 3) {
+    if (fy - hy - hysize < 10){
+      stage = 4;
+      temp = 0;
+     
+    }
+    
+    hy ++;
+    
+    mx --;
+    mx --;
+    
+    wx --;
+    wx --;
+    
+    image(bimg, 0, 0);
+    
+    image(himg, hx, hy);
+    image(wimg, wx, wy);
     image(mimg, mx, my);
   }
   
-  if (stage == 3) {
-    if (fy - hy - hysize < 50){
-      stage = 4;
-      temp = 0;
-    }
-    hx ++;
-    hx ++;
-    hy ++;
-    hy ++;
-    image(bimg, 0, 0);
-    image(himg, hx, hy);
-  }
-  
+  // h and w talk (up and down)
   if (stage == 2) {
     
     if (temp == period * 20){
@@ -101,20 +129,19 @@ void draw() {
     image(bimg, 0, 0);
 
     pushMatrix();
-    translate(hx, hy);
-    rotate(PI/30 * pow(-1, floor(temp/ period)));
+    translate(hx, hy + 5 * (floor(temp/period) % 2) );
     image(himg, 0, 0);
     popMatrix();
     
     pushMatrix();
-    translate(wx, wy);
-    rotate(PI/30 * pow(-1, floor( (temp+period) / period)));
+    translate(wx, wy + 5 * (floor((temp+period)/period) % 2) );
     image(wimg, 0, 0);
     popMatrix();
     
     
   }
 
+  // h and w meet
   if (stage == 1) {
     if (wx - hx < 50) {
       stage = 2;
